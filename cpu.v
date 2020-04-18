@@ -31,7 +31,8 @@ module cpu(
     main_controller main_controller(
                         .opcode     (opcode     ),
                         .rs2_imm_sel(rs2_imm_sel),
-                        .reg_w_en   (rs2_w_en   )
+                        .reg_w_en   (rs2_w_en   ),
+                        .mem_w_en   (mem_w_en   )
                     );
 
     ALU_decoder     ALU_decoder(
@@ -49,10 +50,11 @@ module cpu(
                     );
 
     regfile         regfile(
-                        .rs1_addr(rs1_addr),
-                        .rs2_addr(rs2_addr),
-                        .rs1_data(rs1_data),
-                        .rs2_data(rs2_data)
+                        .rs1_addr   (rs1_addr),
+                        .rs2_addr   (rs2_addr),
+                        .rs1_data   (rs1_data),
+                        .rs2_data   (rs2_data),
+                        .clk        ()
                     );
 
     always @(posedge clk) begin
@@ -67,9 +69,12 @@ module cpu(
         ID_EX_alu_ctrl      <= alu_ctrl;
         ID_EX_rs2_imm_sel   <= rs2_imm_sel;
         ID_EX_reg_w_en      <= reg_w_en;
+        ID_EX_mem_w_en      <= mem_w_en;
     end
 
     always @(posedge clk) begin
-        EX_MEM_alu_out <=  alu_out;
+        EX_MEM_alu_out  <= alu_out;
+        EX_MEM_mem_w_en <= ID_EX_mem_w_en;
+        EX_MEM_reg_w_en <= ID_EX_reg_w_en;
     end
 endmodule
