@@ -64,6 +64,8 @@ parameter ALU_SLTU  = 4'h9;
                         3'h3: alu_dec = ALU_SLTU;
                     endcase
                 end
+                7'b0000011: alu_dec = ALU_ADD;
+                7'b0100011: alu_dec = ALU_ADD;
             endcase
         end
     endfunction

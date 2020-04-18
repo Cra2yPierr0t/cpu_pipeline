@@ -17,9 +17,20 @@ module cpu(
     reg [3:0]   ID_EX_alu_ctrl;
     reg         ID_EX_rs2_imm_sel;
     reg         ID_EX_reg_w_en;
+    reg         ID_EX_mem_w_en;
+    reg         ID_EX_mem_alu_sel;
 
     reg [31:0]  EX_MEM_alu_out;
     reg         EX_MEM_reg_w_en;
+    reg [4:0]   EX_MEM_rd_addr;
+    reg         EX_MEM_mem_r_en;
+    reg         EX_MEM_mem_alu_sel;
+
+    reg [31:0]  MEM_WB_mem_r_data;
+    reg [31:0]  MEM_WB_alu_out;
+    reg [4:0]   MEM_WB_rd_addr;
+    reg         MEM_WB_reg_w_en;
+    reg         MEM_WB_mem_alu_sel;
 
     main_decoder    main_decoder(
                         .instr      (instr      ),
@@ -48,10 +59,10 @@ module cpu(
     
     assign alu_data_2 = ID_EX_rs2_imm_sel ? ID_EX_imm_I : ID_EX_rs2_data; 
     ALU             ALU(
-                        .alu_ctrl   (alu_ctrl   ),
-                        .alu_data_1 (alu_data_1 ),
-                        .alu_data_2 (alu_data_2 ),
-                        .alu_out    (alu_out    )
+                        .alu_ctrl   (ID_EX_alu_ctrl ),
+                        .alu_data_1 (ID_EX_rs1_data ),
+                        .alu_data_2 (alu_data_2     ),
+                        .alu_out    (alu_out        )
                     );
 
     assign reg_w_data = MEM_WB_mem_alu_sel ? MEM_WB_alu_out : MEM_WB_mem_r_data;
