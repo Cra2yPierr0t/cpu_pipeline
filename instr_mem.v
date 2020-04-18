@@ -5,5 +5,16 @@ module instr_mem(
 
     reg [31:0] mem[1023:0];
 
-    assign instr = mem[addr];
+    assign instr = mem[addr >> 2];
+
+    initial begin
+        mem[0] = 32'h01400313;
+        mem[1] = 32'h01e00393;
+        mem[2] = 32'h02800e13;
+        mem[3] = 32'h01c30eb3;
+        mem[4] = 32'h01c30eb3;
+        mem[5] = 32'h01c30eb3;
+        mem[6] = 32'h01c30eb3;
+        mem[7] = 32'h01c30eb3;
+    end
 endmodule

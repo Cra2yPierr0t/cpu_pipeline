@@ -72,6 +72,7 @@ module cpu(
                     );
 
     ALU_decoder     ALU_decoder(
+                        .opcode     (opcode     ),
                         .funct3     (funct3     ),
                         .funct7     (funct7     ),
                         .alu_ctrl   (alu_ctrl   )
