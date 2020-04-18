@@ -25,14 +25,10 @@ module cpu(
     reg         EX_MEM_reg_w_en = 0;
     reg [4:0]   EX_MEM_rd_addr  = 5'b00000;
     reg         EX_MEM_mem_alu_sel = 0;
-    reg [4:0]   EX_MEM_rs1_addr = 5'b00000;
-    reg [4:0]   EX_MEM_rs2_addr = 5'b00000;
 
     reg [31:0]  MEM_WB_mem_r_data   = 32'h0000_0000;
     reg [31:0]  MEM_WB_alu_out      = 32'h0000_0000;
     reg [4:0]   MEM_WB_rd_addr      = 5'b00000;
-    reg [4:0]   MEM_WB_rs1_addr     = 5'b00000;
-    reg [4:0]   MEM_WB_rs2_addr     = 5'b00000;
     reg         MEM_WB_reg_w_en     = 0;
     reg         MEM_WB_mem_alu_sel  = 0;
 
@@ -84,6 +80,7 @@ module cpu(
                         .funct7     (funct7     ),
                         .alu_ctrl   (alu_ctrl   )
                     );
+
     assign alu_data_1 = (ID_EX_rs1_addr == EX_MEM_rd_addr) ? EX_MEM_alu_out
                       : (ID_EX_rs1_addr == MEM_WB_rd_addr) ? MEM_WB_alu_out
                                                            : ID_EX_rs1_data;
@@ -135,21 +132,16 @@ module cpu(
 
     always @(posedge clk) begin
         EX_MEM_alu_out      <= alu_out;
-        EX_MEM_rs1_addr     <= ID_EX_rs1_addr;
-        EX_MEM_rs2_addr     <= ID_EX_rs2_addr;
         EX_MEM_rd_addr      <= ID_EX_rd_addr;
         EX_MEM_mem_w_en     <= ID_EX_mem_w_en;
         EX_MEM_reg_w_en     <= ID_EX_reg_w_en;
         EX_MEM_mem_alu_sel  <= ID_EX_mem_alu_sel;
-        EX_MEM_rs2_data     <= ID_EX_rs2_data;
     end
 
     always @(posedge clk) begin
         MEM_WB_mem_r_data   <= mem_r_data;
         MEM_WB_alu_out      <= EX_MEM_alu_out;
         MEM_WB_rd_addr      <= EX_MEM_rd_addr;
-        MEM_WB_rs1_addr     <= EX_MEM_rs1_addr;
-        MEM_WB_rs2_addr     <= EX_MEM_rs2_addr;
         MEM_WB_reg_w_en     <= EX_MEM_reg_w_en; 
         MEM_WB_mem_alu_sel  <= EX_MEM_mem_alu_sel;
     end

@@ -11,15 +11,17 @@ module regfile(
 
     reg [31:0] register[0:31];
 
-    assign rs1_data = register[rs1_addr];
-    assign rs2_data = register[rs2_addr];
+    assign rs1_data = ((rs1_addr == rd_addr) && (rs1_addr != 5'b00000)) ? w_data 
+                                                                        : register[rs1_addr];
+    assign rs2_data = ((rs2_addr == rd_addr) && (rs2_addr != 5'b00000)) ? w_data 
+                                                                        : register[rs2_addr];
 
     initial begin
         register[0] = 32'h0000_0000;
     end
 
     always @(posedge clk) begin
-        if(w_en == 1 && rd_addr != 32'h0000_0000) begin
+        if(w_en == 1 && rd_addr != 5'b00000) begin
             register[rd_addr] <= w_data;
         end else begin
             register[rd_addr] <= register[rd_addr];

@@ -12,9 +12,10 @@ module instr_mem(
         mem[1] = 32'h01e00393;
         mem[2] = 32'h02800e13;
         mem[3] = 32'h01c30eb3;
-        mem[4] = 32'h01c30eb3;
-        mem[5] = 32'h01c30eb3;
-        mem[6] = 32'h01c30eb3;
-        mem[7] = 32'h01c30eb3;
+        mem[4] = 32'h00000013;
+        mem[5] = 32'h00000013;
+        mem[6] = 32'h00000013;
+        mem[7] = 32'h00000013;
+        mem[8] = 32'h00000013;
     end
 endmodule
