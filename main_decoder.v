@@ -7,7 +7,6 @@ module main_decoder(
     output  wire    [4:0]   rs1_addr,
     output  wire    [4:0]   rs2_addr,
     output  wire    [31:0]  imm_I,
-    output  wire    [31:0]  uimm_I,
     output  wire    [31:0]  imm_S,
     output  wire    [31:0]  uimm_S,
     output  wire    [31:0]  imm_B,
@@ -25,7 +24,6 @@ module main_decoder(
     assign rs2_addr = instr[24:20];
     assign imm_I    = instr[31] ? {20'hfffff, instr[31:20]} 
                                 : {20'h00000, instr[31:20]};
-    assign uimm_I   = {20'h00000, instr[31:20]};
     assign imm_S    = instr[31] ? {20'hfffff, instr[31:25], instr[11:7]}
                                 : {20'h00000, instr[31:25], instr[11:7]};
     assign uimm_S   = {20'h00000, instr[31:25], instr[11:7]};
