@@ -33,10 +33,11 @@ module cpu(
                     );
 
     main_controller main_controller(
-                        .opcode     (opcode     ),
-                        .rs2_imm_sel(rs2_imm_sel),
-                        .reg_w_en   (rs2_w_en   ),
-                        .mem_w_en   (mem_w_en   )
+                        .opcode         (opcode         ),
+                        .rs2_imm_sel    (rs2_imm_sel    ),
+                        .reg_w_en       (rs2_w_en       ),
+                        .mem_w_en       (mem_w_en       ),
+                        .mem_alu_sel    (mem_alu_sel    )
                     );
 
     ALU_decoder     ALU_decoder(
@@ -53,12 +54,13 @@ module cpu(
                         .alu_out    (alu_out    )
                     );
 
+    assign reg_w_data = MEM_WB_mem_alu_sel ? MEM_WB_alu_out : MEM_WB_mem_r_data;
     regfile         regfile(
                         .rs1_addr   (rs1_addr           ),
                         .rs2_addr   (rs2_addr           ),
                         .rs1_data   (rs1_data           ),
                         .rs2_data   (rs2_data           ),
-                        .rd_addr    (MEM_WB_mem_rd_addr ),
+                        .rd_addr    (reg_w_data         ),
                         .w_data     (MEM_WB_mem_r_data  ),
                         .w_en       (MEM_WB_reg_w_en    ),
                         .clk        ()
@@ -77,18 +79,22 @@ module cpu(
         ID_EX_rs2_imm_sel   <= rs2_imm_sel;
         ID_EX_reg_w_en      <= reg_w_en;
         ID_EX_mem_w_en      <= mem_w_en;
+        ID_EX_mem_alu_sel   <= mem_alu_sel;
     end
 
     always @(posedge clk) begin
-        EX_MEM_alu_out  <= alu_out;
-        EX_MEM_rd_addr  <= ID_EX_rd_addr;
-        EX_MEM_mem_w_en <= ID_EX_mem_w_en;
-        EX_MEM_reg_w_en <= ID_EX_reg_w_en;
+        EX_MEM_alu_out      <= alu_out;
+        EX_MEM_rd_addr      <= ID_EX_rd_addr;
+        EX_MEM_mem_w_en     <= ID_EX_mem_w_en;
+        EX_MEM_reg_w_en     <= ID_EX_reg_w_en;
+        EX_MEM_mem_alu_sel  <= ID_EX_mem_alu_sel;
     end
 
     always @(posedge clk) begin
         MEM_WB_mem_r_data   <= mem_r_data;
+        MEM_WB_alu_out      <= EX_MEM_alu_out;
         MEM_WB_rd_addr      <= EX_MEM_rd_addr;
         MEM_WB_reg_w_en     <= EX_MEM_reg_w_en; 
+        MEM_WB_mem_alu_sel  <= EX_MEM_mem_alu_sel;
     end
 endmodule
