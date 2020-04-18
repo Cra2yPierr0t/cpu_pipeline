@@ -8,7 +8,7 @@ module data_mem(
     
     reg [31:0]  mem[1023:0];
 
-    assign w_data = mem[addr];
+    assign r_data = mem[addr];
     always @(posedge clk) begin
         if(w_en == 1'b1) begin
             mem[addr >> 2] <= w_data;

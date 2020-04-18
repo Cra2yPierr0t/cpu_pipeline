@@ -30,6 +30,28 @@ module cpu(
     reg         MEM_WB_reg_w_en     = 0;
     reg         MEM_WB_mem_alu_sel  = 0;
 
+    wire    [6:0]   opcode;
+    wire    [2:0]   funct3;
+    wire    [6:0]   funct7;
+    wire    [4:0]   rd_addr;
+    wire    [4:0]   rs1_addr;
+    wire    [4:0]   rs2_addr;
+    wire    [31:0]  imm_I;
+
+    wire            rs2_imm_sel;
+    wire            reg_w_en;
+    wire            mem_w_en;
+    wire            mem_alu_sel;
+
+    wire    [3:0]   alu_ctrl;
+
+    wire    [31:0]  alu_data_2;
+    wire    [31:0]  alu_out;
+
+    wire    [31:0]  rs1_data;
+    wire    [31:0]  rs2_data;
+    wire    [31:0]  reg_w_data;
+
     main_decoder    main_decoder(
                         .instr      (instr      ),
                         .opcode     (opcode     ),
@@ -44,7 +66,7 @@ module cpu(
     main_controller main_controller(
                         .opcode         (opcode         ),
                         .rs2_imm_sel    (rs2_imm_sel    ),
-                        .reg_w_en       (rs2_w_en       ),
+                        .reg_w_en       (reg_w_en       ),
                         .mem_w_en       (mem_w_en       ),
                         .mem_alu_sel    (mem_alu_sel    )
                     );
@@ -69,8 +91,8 @@ module cpu(
                         .rs2_addr   (rs2_addr           ),
                         .rs1_data   (rs1_data           ),
                         .rs2_data   (rs2_data           ),
-                        .rd_addr    (reg_w_data         ),
-                        .w_data     (MEM_WB_mem_r_data  ),
+                        .rd_addr    (MEM_WB_rd_addr     ),
+                        .w_data     (reg_w_data         ),
                         .w_en       (MEM_WB_reg_w_en    ),
                         .clk        (clk)
                     );

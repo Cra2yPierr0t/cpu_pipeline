@@ -13,11 +13,11 @@ module main_controller(
     );
         begin
             case(opcode)
-                7'b0110011: decoder <= 4'b0101;
-                7'b0010011: decoder <= 4'b1101;
-                7'b0100011: decoder <= 4'b1100;
-                7'b0000011: decoder <= 4'b1010;
-                default:    decoder <= 4'b0000;
+                7'b0110011: decoder = 4'b0101;
+                7'b0010011: decoder = 4'b1101;
+                7'b0100011: decoder = 4'b1100;
+                7'b0000011: decoder = 4'b1010;
+                default:    decoder = 4'b0000;
             endcase
         end
     endfunction
