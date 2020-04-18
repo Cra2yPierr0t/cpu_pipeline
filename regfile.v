@@ -6,7 +6,7 @@ module regfile(
     input   wire         w_en,
     output  wire [31:0]  rs1_data,
     output  wire [31:0]  rs2_data,
-    input   wire         clock
+    input   wire         clk
 );
 
     reg [31:0] register[0:31];
@@ -18,7 +18,7 @@ module regfile(
         register[0] = 32'h0000_0000;
     end
 
-    always @(posedge clock) begin
+    always @(posedge clk) begin
         if(w_en == 1 && rd_addr != 32'h0000_0000) begin
             register[rd_addr] <= w_data;
         end else begin

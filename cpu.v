@@ -1,7 +1,11 @@
 module cpu(
     input   wire            clk,
     input   wire    [31:0]  instr,
-    output  wire    [31:0]  instr_addr
+    output  wire    [31:0]  instr_addr,
+    output  reg             EX_MEM_mem_w_en,
+    output  reg     [31:0]  EX_MEM_rd_addr,
+    output  reg     [31:0]  EX_MEM_alu_out,
+    input   wire    [31:0]  mem_r_data
 );
 
     reg [31:0] IF_ID_instr;
@@ -50,10 +54,13 @@ module cpu(
                     );
 
     regfile         regfile(
-                        .rs1_addr   (rs1_addr),
-                        .rs2_addr   (rs2_addr),
-                        .rs1_data   (rs1_data),
-                        .rs2_data   (rs2_data),
+                        .rs1_addr   (rs1_addr           ),
+                        .rs2_addr   (rs2_addr           ),
+                        .rs1_data   (rs1_data           ),
+                        .rs2_data   (rs2_data           ),
+                        .rd_addr    (MEM_WB_mem_rd_addr ),
+                        .w_data     (MEM_WB_mem_r_data  ),
+                        .w_en       (MEM_WB_reg_w_en    ),
                         .clk        ()
                     );
 
@@ -74,7 +81,14 @@ module cpu(
 
     always @(posedge clk) begin
         EX_MEM_alu_out  <= alu_out;
+        EX_MEM_rd_addr  <= ID_EX_rd_addr;
         EX_MEM_mem_w_en <= ID_EX_mem_w_en;
         EX_MEM_reg_w_en <= ID_EX_reg_w_en;
+    end
+
+    always @(posedge clk) begin
+        MEM_WB_mem_r_data   <= mem_r_data;
+        MEM_WB_rd_addr      <= EX_MEM_rd_addr;
+        MEM_WB_reg_w_en     <= EX_MEM_reg_w_en; 
     end
 endmodule
