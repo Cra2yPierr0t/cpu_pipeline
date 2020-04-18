@@ -1,36 +1,34 @@
 module cpu(
     input   wire            clk,
     input   wire    [31:0]  instr,
-    output  wire    [31:0]  instr_addr,
-    output  reg             EX_MEM_mem_w_en,
-    output  reg     [31:0]  EX_MEM_rd_addr,
-    output  reg     [31:0]  EX_MEM_alu_out,
+    output  reg     [31:0]  pc  = 32'h0000_0000,
+    output  reg             EX_MEM_mem_w_en = 0,
+    output  reg     [31:0]  EX_MEM_alu_out  = 32'h0000_0000,
+    output  reg     [31:0]  EX_MEM_rs2_data = 32'h0000_0000,
     input   wire    [31:0]  mem_r_data
 );
 
-    reg [31:0] IF_ID_instr;
+    reg [31:0]  IF_ID_instr = 32'h0000_0000;
 
-    reg [31:0]  ID_EX_rs1_data;
-    reg [31:0]  ID_EX_rs2_data;
-    reg [4:0]   ID_EX_rd_addr;
-    reg [31:0]  ID_EX_imm_I;
-    reg [3:0]   ID_EX_alu_ctrl;
-    reg         ID_EX_rs2_imm_sel;
-    reg         ID_EX_reg_w_en;
-    reg         ID_EX_mem_w_en;
-    reg         ID_EX_mem_alu_sel;
+    reg [31:0]  ID_EX_rs1_data  = 32'h0000_0000;
+    reg [31:0]  ID_EX_rs2_data  = 32'h0000_0000;
+    reg [4:0]   ID_EX_rd_addr   = 5'b00000;
+    reg [31:0]  ID_EX_imm_I     = 32'h0000_0000;
+    reg [3:0]   ID_EX_alu_ctrl  = 4'h0;
+    reg         ID_EX_rs2_imm_sel   = 0;
+    reg         ID_EX_reg_w_en      = 0;
+    reg         ID_EX_mem_w_en      = 0;
+    reg         ID_EX_mem_alu_sel   = 0;
 
-    reg [31:0]  EX_MEM_alu_out;
-    reg         EX_MEM_reg_w_en;
-    reg [4:0]   EX_MEM_rd_addr;
-    reg         EX_MEM_mem_r_en;
-    reg         EX_MEM_mem_alu_sel;
+    reg         EX_MEM_reg_w_en = 0;
+    reg [4:0]   EX_MEM_rd_addr  = 5'b00000;
+    reg         EX_MEM_mem_alu_sel = 0;
 
-    reg [31:0]  MEM_WB_mem_r_data;
-    reg [31:0]  MEM_WB_alu_out;
-    reg [4:0]   MEM_WB_rd_addr;
-    reg         MEM_WB_reg_w_en;
-    reg         MEM_WB_mem_alu_sel;
+    reg [31:0]  MEM_WB_mem_r_data   = 32'h0000_0000;
+    reg [31:0]  MEM_WB_alu_out      = 32'h0000_0000;
+    reg [4:0]   MEM_WB_rd_addr      = 5'b00000;
+    reg         MEM_WB_reg_w_en     = 0;
+    reg         MEM_WB_mem_alu_sel  = 0;
 
     main_decoder    main_decoder(
                         .instr      (instr      ),
@@ -74,8 +72,12 @@ module cpu(
                         .rd_addr    (reg_w_data         ),
                         .w_data     (MEM_WB_mem_r_data  ),
                         .w_en       (MEM_WB_reg_w_en    ),
-                        .clk        ()
+                        .clk        (clk)
                     );
+
+    always @(posedge clk) begin
+        pc = pc + 32'h4;
+    end
 
     always @(posedge clk) begin
         IF_ID_instr <= instr;
@@ -99,6 +101,7 @@ module cpu(
         EX_MEM_mem_w_en     <= ID_EX_mem_w_en;
         EX_MEM_reg_w_en     <= ID_EX_reg_w_en;
         EX_MEM_mem_alu_sel  <= ID_EX_mem_alu_sel;
+        EX_MEM_rs2_data     <= ID_EX_rs2_data;
     end
 
     always @(posedge clk) begin
