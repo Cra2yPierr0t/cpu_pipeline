@@ -16,6 +16,8 @@ module regfile(
     assign rs2_data = ((rs2_addr == rd_addr) && (rs2_addr != 5'b00000)) ? w_data 
                                                                         : register[rs2_addr];
 
+    assign rs1_data = (rs1_addr == rd_addr) ? w_data : registers[rs1_addr];
+
     initial begin
         register[0] = 32'h0000_0000;
     end
