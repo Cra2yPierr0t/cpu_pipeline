@@ -18,6 +18,7 @@ module cpu(
     reg [31:0]  ID_EX_imm_I     = 32'h0000_0000;
     reg [31:0]  ID_EX_imm_S     = 32'h0000_0000;
     reg [3:0]   ID_EX_alu_ctrl  = 4'h0;
+    reg [6:0]   ID_EX_opcode    = 7'b0000000;
     reg         ID_EX_rs2_imm_sel   = 0;
     reg         ID_EX_reg_w_en      = 0;
     reg         ID_EX_mem_w_en      = 0;
@@ -61,6 +62,8 @@ module cpu(
     wire    [31:0]  rs2_data;
     wire    [31:0]  reg_w_data;
 
+    wire            stall;
+
     main_decoder    main_decoder(
                         .instr      (instr      ),
                         .opcode     (opcode     ),
@@ -90,12 +93,12 @@ module cpu(
                     );
 
     assign imm_data = ID_EX_imm_SI_sel ? ID_EX_imm_I : ID_EX_imm_S;
-    assign alu_data_1 = (ID_EX_rs1_addr == EX_MEM_rd_addr) ? EX_MEM_alu_out
-                      : (ID_EX_rs1_addr == MEM_WB_rd_addr) ? MEM_WB_alu_out
-                                                           : ID_EX_rs1_data;
+    assign alu_data_1 = (ID_EX_rs1_addr == EX_MEM_rd_addr) & EX_MEM_reg_w_en    ? EX_MEM_alu_out
+                      : (ID_EX_rs1_addr == MEM_WB_rd_addr) & MEM_WB_reg_w_en    ? reg_w_data     //MEM_WB_alu_out
+                                                                                : ID_EX_rs1_data;
     assign alu_data_2 = ID_EX_rs2_imm_sel                  ? imm_data 
-                      : (ID_EX_rs2_addr == EX_MEM_rd_addr) ? EX_MEM_alu_out
-                      : (ID_EX_rs2_addr == MEM_WB_rd_addr) ? MEM_WB_alu_out
+                      : (ID_EX_rs2_addr == EX_MEM_rd_addr) & EX_MEM_reg_w_en    ? EX_MEM_alu_out
+                      : (ID_EX_rs2_addr == MEM_WB_rd_addr) & MEM_WB_reg_w_en    ? reg_w_data     //MEM_WB_alu_out
                       : ID_EX_rs2_data; 
     ALU             ALU(
                         .alu_ctrl   (ID_EX_alu_ctrl ),
@@ -119,28 +122,63 @@ module cpu(
     assign mem_w_data = (MEM_WB_rd_addr == EX_MEM_rs2_addr) ? reg_w_data
                                                             : MEM_WB_mem_r_data;
 
+    pipeline_interlock  pipeline_interlock(
+                            .opcode     (opcode   ),
+                            .rd_addr    (rd_addr  ),
+                            .rs1_addr   (rs1_addr ),
+                            .rs2_addr   (rs2_addr ),
+                            .clk        (clk            ),
+                            .stall      (stall          )
+                        );
+
     always @(posedge clk) begin
-        pc = pc + 32'h4;
+        if(stall) begin
+            pc = pc;
+        end else begin
+            pc = pc + 32'h4;
+        end
     end
 
     always @(posedge clk) begin
-        IF_ID_instr <= instr;
+        if(stall) begin
+            IF_ID_instr <= IF_ID_instr;
+        end else begin
+            IF_ID_instr <= instr;
+        end
     end
 
     always @(posedge clk) begin
-        ID_EX_rs1_data      <= rs1_data;
-        ID_EX_rs2_data      <= rs2_data;
-        ID_EX_rs1_addr      <= rs1_addr;
-        ID_EX_rs2_addr      <= rs2_addr;
-        ID_EX_rd_addr       <= rd_addr;
-        ID_EX_imm_I         <= imm_I;
-        ID_EX_imm_S         <= imm_S;
-        ID_EX_alu_ctrl      <= alu_ctrl;
-        ID_EX_rs2_imm_sel   <= rs2_imm_sel;
-        ID_EX_reg_w_en      <= reg_w_en;
-        ID_EX_mem_w_en      <= mem_w_en;
-        ID_EX_mem_alu_sel   <= mem_alu_sel;
-        ID_EX_imm_SI_sel    <= imm_SI_sel;
+        if(stall) begin
+            ID_EX_rs1_data      <= ID_EX_rs1_data;
+            ID_EX_rs2_data      <= ID_EX_rs2_data;
+            ID_EX_rs1_addr      <= ID_EX_rs1_addr;
+            ID_EX_rs2_addr      <= ID_EX_rs2_addr;
+            ID_EX_rd_addr       <= ID_EX_rd_addr;
+            ID_EX_imm_I         <= ID_EX_imm_I;
+            ID_EX_imm_S         <= ID_EX_imm_S;
+            ID_EX_alu_ctrl      <= ID_EX_alu_ctrl;
+            ID_EX_rs2_imm_sel   <= ID_EX_rs2_imm_sel;
+            ID_EX_reg_w_en      <= ID_EX_reg_w_en;
+            ID_EX_mem_w_en      <= ID_EX_mem_w_en;
+            ID_EX_mem_alu_sel   <= ID_EX_mem_alu_sel;
+            ID_EX_imm_SI_sel    <= ID_EX_imm_SI_sel;
+            ID_EX_opcode        <= ID_EX_opcode;
+        end else begin
+            ID_EX_rs1_data      <= rs1_data;
+            ID_EX_rs2_data      <= rs2_data;
+            ID_EX_rs1_addr      <= rs1_addr;
+            ID_EX_rs2_addr      <= rs2_addr;
+            ID_EX_rd_addr       <= rd_addr;
+            ID_EX_imm_I         <= imm_I;
+            ID_EX_imm_S         <= imm_S;
+            ID_EX_alu_ctrl      <= alu_ctrl;
+            ID_EX_rs2_imm_sel   <= rs2_imm_sel;
+            ID_EX_reg_w_en      <= reg_w_en;
+            ID_EX_mem_w_en      <= mem_w_en;
+            ID_EX_mem_alu_sel   <= mem_alu_sel;
+            ID_EX_imm_SI_sel    <= imm_SI_sel;
+            ID_EX_opcode        <= opcode;
+        end
     end
 
     always @(posedge clk) begin

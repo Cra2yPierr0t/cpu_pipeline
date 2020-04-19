@@ -2,10 +2,13 @@
 .global main
 main:
     addi t1, zero, 20
-    addi t2, zero, 30
-    add  t3, t1, t2
+    sw   t1, 0(zero)
+    nop
+    nop
+    nop
     lw   t3, 0(zero)
-    sw   t3, 4(zero)
+    add  t4, t3, zero
+    nop
     nop
     nop
     nop
