@@ -8,18 +8,33 @@ module instr_mem(
     assign instr = mem[addr >> 2];
 
     initial begin
-        mem[0] = 32'h01400313;
-        mem[1] = 32'h00602023;
-        mem[2] = 32'h00000013;
-        mem[3] = 32'h00000013;
-        mem[4] = 32'h00000013;
-        mem[5] = 32'h00002e03;
-        mem[6] = 32'h000e0eb3;
-        mem[7] = 32'h00000013;
-        mem[8] = 32'h00000013;
-        mem[9] = 32'h00000013;
-        mem[10] = 32'h00000013;
-        mem[11] = 32'h00000013;
-        mem[12] = 32'h00000013;
+     	mem[1] = 32'h0ff10113;       //	addi	sp,sp,255
+     	mem[2] = 32'h00200313;       //	li	t1,2
+     	mem[3] = 32'h00612023;       //	sw	t1,0(sp)
+     	mem[4] = 32'hffc10113;       //	addi	sp,sp,-4
+     	mem[5] = 32'h00410113;       //	addi	sp,sp,4
+     	mem[6] = 32'h00012583;       //	lw	a1,0(sp)
+     	mem[7] = 32'h00300313;       //	li	t1,3
+     	mem[8] = 32'h00612023;       //	sw	t1,0(sp)
+     	mem[9] = 32'hffc10113;       //	addi	sp,sp,-4
+     	mem[10] = 32'h00410113;       //	addi	sp,sp,4
+     	mem[11] = 32'h00012603;       //	lw	a2,0(sp)
+     	mem[12] = 32'h00b12023;       //	sw	a1,0(sp)
+     	mem[13] = 32'hffc10113;       //	addi	sp,sp,-4
+     	mem[14] = 32'h00c12023;       //	sw	a2,0(sp)
+     	mem[15] = 32'hffc10113;       //	addi	sp,sp,-4
+     	mem[16] = 32'h00410113;       //	addi	sp,sp,4
+     	mem[17] = 32'h00012303;       //	lw	t1,0(sp)
+     	mem[18] = 32'h00410113;       //	addi	sp,sp,4
+     	mem[19] = 32'h00012383;       //	lw	t2,0(sp)
+     	mem[20] = 32'h00730333;       //	add	t1,t1,t2
+     	mem[21] = 32'h00612023;       //	sw	t1,0(sp)
+     	mem[22] = 32'hffc10113;       //	addi	sp,sp,-4
+     	mem[23] = 32'h00410113;       //	addi	sp,sp,4
+     	mem[24] = 32'h00012583;       //	lw	a1,0(sp)
+     	mem[25] = 32'h00b12023;       //	sw	a1,0(sp)
+     	mem[26] = 32'hffc10113;       //	addi	sp,sp,-4
+     	mem[27] = 32'h00410113;       //	addi	sp,sp,4
+     	mem[28] = 32'h00012503;       //	lw	a0,0(sp)
     end
 endmodule

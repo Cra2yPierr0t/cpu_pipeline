@@ -120,7 +120,7 @@ module cpu(
                     );
 
     assign mem_w_data = (MEM_WB_rd_addr == EX_MEM_rs2_addr) ? reg_w_data
-                                                            : MEM_WB_mem_r_data;
+                                                            : EX_MEM_rs2_data;
 
     pipeline_interlock  pipeline_interlock(
                             .opcode     (opcode   ),
@@ -185,8 +185,13 @@ module cpu(
         EX_MEM_alu_out      <= alu_out;
         EX_MEM_rd_addr      <= ID_EX_rd_addr;
         EX_MEM_rs2_addr     <= ID_EX_rs2_addr;
-        EX_MEM_mem_w_en     <= ID_EX_mem_w_en;
-        EX_MEM_reg_w_en     <= ID_EX_reg_w_en;
+        if(stall) begin
+            EX_MEM_mem_w_en     <= 0;
+            EX_MEM_reg_w_en     <= 0;
+        end else begin
+            EX_MEM_mem_w_en     <= ID_EX_mem_w_en;
+            EX_MEM_reg_w_en     <= ID_EX_reg_w_en;
+        end
         EX_MEM_rs2_data     <= ID_EX_rs2_data;
         EX_MEM_mem_alu_sel  <= ID_EX_mem_alu_sel;
     end
