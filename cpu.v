@@ -64,6 +64,9 @@ module cpu(
 
     wire            stall;
 
+    wire            branch_detect;
+    wire            branch_result;
+
     main_decoder    main_decoder(
                         .instr      (instr      ),
                         .opcode     (opcode     ),
@@ -82,7 +85,8 @@ module cpu(
                         .reg_w_en       (reg_w_en       ),
                         .mem_w_en       (mem_w_en       ),
                         .mem_alu_sel    (mem_alu_sel    ),
-                        .imm_SI_sel     (imm_SI_sel     )
+                        .imm_SI_sel     (imm_SI_sel     ),
+                        .branch_detect  (branch_detect  )
                     );
 
     ALU_decoder     ALU_decoder(
@@ -127,9 +131,17 @@ module cpu(
                             .rd_addr    (rd_addr  ),
                             .rs1_addr   (rs1_addr ),
                             .rs2_addr   (rs2_addr ),
-                            .clk        (clk            ),
-                            .stall      (stall          )
+                            .clk        (clk      ),
+                            .stall      (stall    )
                         );
+
+    branch_judge  branch_judge(
+                    .rs1_data       (rs1_data       ),
+                    .rs2_data       (rs2_data       ),
+                    .funct3         (funct3         ),
+                    .branch_detect  (branch_detect  ),
+                    .branch_result  (branch_result  )
+                );
 
     always @(posedge clk) begin
         if(stall) begin
