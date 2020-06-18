@@ -163,6 +163,8 @@ module cpu(
     always @(posedge clk) begin
         if(stall) begin
             IF_ID_instr <= IF_ID_instr;
+        end else if(branch_detect && branch_result) begin
+            IF_ID_instr <= 32'h00000033;
         end else begin
             IF_ID_instr <= instr;
         end
@@ -184,21 +186,6 @@ module cpu(
             ID_EX_mem_alu_sel   <= ID_EX_mem_alu_sel;
             ID_EX_imm_SI_sel    <= ID_EX_imm_SI_sel;
             ID_EX_opcode        <= ID_EX_opcode;
-        end else if(branch_detect && branch_result) begin
-            ID_EX_rs1_data      <= rs1_data;
-            ID_EX_rs2_data      <= rs2_data;
-            ID_EX_rs1_addr      <= rs1_addr;
-            ID_EX_rs2_addr      <= rs2_addr;
-            ID_EX_rd_addr       <= rd_addr;
-            ID_EX_imm_I         <= imm_I;
-            ID_EX_imm_S         <= imm_S;
-            ID_EX_alu_ctrl      <= alu_ctrl;
-            ID_EX_rs2_imm_sel   <= rs2_imm_sel;
-            ID_EX_reg_w_en      <= 0;
-            ID_EX_mem_w_en      <= 0;
-            ID_EX_mem_alu_sel   <= mem_alu_sel;
-            ID_EX_imm_SI_sel    <= imm_SI_sel;
-            ID_EX_opcode        <= opcode;
         end else begin
             ID_EX_rs1_data      <= rs1_data;
             ID_EX_rs2_data      <= rs2_data;

@@ -37,5 +37,6 @@ module instr_mem(
      	mem[27] = 32'h00410113;       //	addi	sp,sp,4
      	mem[28] = 32'h00012503;       //	lw	a0,0(sp)
         mem[29] = 32'b1111100_00000_00000_000_10001_1100011;
+     	mem[30] = 32'h00730333;       //	add	t1,t1,t2
     end
 endmodule
