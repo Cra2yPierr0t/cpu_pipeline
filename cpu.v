@@ -45,6 +45,8 @@ module cpu(
     wire    [4:0]   rs2_addr;
     wire    [31:0]  imm_I;
     wire    [31:0]  imm_S;
+    wire    [31:0]  imm_B;
+    wire    [31:0]  uimm_B;
     wire    [31:0]  imm_data;
 
     wire            rs2_imm_sel;
@@ -66,9 +68,10 @@ module cpu(
 
     wire            branch_detect;
     wire            branch_result;
+    wire    [31:0]  branch_dest;
 
     main_decoder    main_decoder(
-                        .instr      (instr      ),
+                        .instr      (IF_ID_instr),
                         .opcode     (opcode     ),
                         .funct3     (funct3     ),
                         .funct7     (funct7     ),
@@ -76,7 +79,9 @@ module cpu(
                         .rs1_addr   (rs1_addr   ),
                         .rs2_addr   (rs2_addr   ),
                         .imm_I      (imm_I      ),
-                        .imm_S      (imm_S      )
+                        .imm_S      (imm_S      ),
+                        .imm_B      (imm_B      ),
+                        .uimm_B     (uimm_B     )
                     );
 
     main_controller main_controller(
@@ -143,9 +148,13 @@ module cpu(
                     .branch_result  (branch_result  )
                 );
 
+    assign branch_dest = pc + ((funct3 == 3'b110 || funct3 == 3'b111) ? uimm_B
+                                                                      : imm_B);
     always @(posedge clk) begin
         if(stall) begin
             pc = pc;
+        end else if(branch_result) begin
+            pc = branch_dest;
         end else begin
             pc = pc + 32'h4;
         end
@@ -175,6 +184,21 @@ module cpu(
             ID_EX_mem_alu_sel   <= ID_EX_mem_alu_sel;
             ID_EX_imm_SI_sel    <= ID_EX_imm_SI_sel;
             ID_EX_opcode        <= ID_EX_opcode;
+        end else if(branch_detect && branch_result) begin
+            ID_EX_rs1_data      <= rs1_data;
+            ID_EX_rs2_data      <= rs2_data;
+            ID_EX_rs1_addr      <= rs1_addr;
+            ID_EX_rs2_addr      <= rs2_addr;
+            ID_EX_rd_addr       <= rd_addr;
+            ID_EX_imm_I         <= imm_I;
+            ID_EX_imm_S         <= imm_S;
+            ID_EX_alu_ctrl      <= alu_ctrl;
+            ID_EX_rs2_imm_sel   <= rs2_imm_sel;
+            ID_EX_reg_w_en      <= 0;
+            ID_EX_mem_w_en      <= 0;
+            ID_EX_mem_alu_sel   <= mem_alu_sel;
+            ID_EX_imm_SI_sel    <= imm_SI_sel;
+            ID_EX_opcode        <= opcode;
         end else begin
             ID_EX_rs1_data      <= rs1_data;
             ID_EX_rs2_data      <= rs2_data;

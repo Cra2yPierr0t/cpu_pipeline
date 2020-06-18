@@ -9,6 +9,7 @@ main:
     lw   t3, 0(zero)
     add  t4, t3, zero
     nop
+    beq  zero, zero, main
     nop
     nop
     nop
